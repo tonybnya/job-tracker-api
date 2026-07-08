@@ -10,4 +10,29 @@ generator client {
 
 datasource db {
   provider = "sqlite"
+  url      = "file:./jobs.db"
+}
+
+model User {
+  id        String   @id @default(uuid())
+  name      String
+  email     String   @unique
+  password  String   // Added for secure auth hashing
+  createdAt Datetime @default(now())
+  jobs      Job[]    // One-to-many relationship mapping
+}
+
+model Job {
+  id           String   @id @default(uuid())
+  company      String
+  url          String
+  position     String   // maps to role/position
+  location     String
+  jobType      String   // validated via Zod: on-site, remote, hybrid, internship, contract, part-time
+  appliedDate  DateTime @default(now())
+  status       String   // validated via Zod: applied, phone-screen, interviewed, offer, rejected, ghosted
+  hiringPerson String?
+  notes        String?
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }
