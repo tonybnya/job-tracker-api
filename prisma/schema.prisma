@@ -16,7 +16,7 @@ model User {
   name      String
   email     String   @unique
   password  String   // Added for secure auth hashing
-  createdAt Datetime @default(now())
+  createdAt DateTime @default(now())
   jobs      Job[]    // One-to-many relationship mapping
 }
 
