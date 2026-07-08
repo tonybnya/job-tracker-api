@@ -1,7 +1,7 @@
 /**
- * Script Name : jobRoutes.js
- * Description : Routes layer for job application resources
- * Usage       : node jobRoutes.js
+ * Script Name : authRoutes.js
+ * Description : Routes layer for auth
+ * Usage       : node authRoutes.js
  * Author      : @tonybnya
  */
 
