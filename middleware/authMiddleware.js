@@ -6,6 +6,7 @@
  */
 
 const jwt = require('jsonwebtoken');
+const { sendError } = require('../utils/response');
 const JWT_SECRET = process.env.JWT_SECRET || 'fallback_secret_key';
 
 function authenticateToken(req, res, next) {
@@ -13,7 +14,7 @@ function authenticateToken(req, res, next) {
   const token = authHeader && authHeader.split(' ')[1];
 
   if (!token) {
-    return res.status(401).json({ error: 'Access denied. Token missing' });
+    return sendError(res, 401, 'Access denied. Token missing');
   }
 
   try {
@@ -21,7 +22,7 @@ function authenticateToken(req, res, next) {
     req.user = verified;
     next();
   } catch (error) {
-    res.status(403).json({ error: 'Invalid or expired token' });
+    sendError(res, 403, 'Invalid or expired token');
   }
 }
 

@@ -22,14 +22,14 @@ curl -X POST http://localhost:3000/api/v1/auth/register \
     "name": "Jane Doe",
     "email": "jane@example.com",
     "password": "password123"
-  }'
+  }' | jq
 ```
 
 Fields: `name` (min 2), `email` (valid), `password` (min 6).
 
 Response: `201 Created`
 ```json
-{ "message": "User registered successfully", "userId": "..." }
+{ "success": true, "data": { "userId": "..." } }
 ```
 
 ---
@@ -42,14 +42,17 @@ curl -X POST http://localhost:3000/api/v1/auth/login \
   -d '{
     "email": "alice@example.com",
     "password": "password123"
-  }'
+  }' | jq
 ```
 
 Response: `200 OK`
 ```json
 {
-  "token": "eyJhbGciOiJIUzI1NiIs...",
-  "user": { "id": "...", "name": "Alice Johnson", "email": "alice@example.com" }
+  "success": true,
+  "data": {
+    "token": "eyJhbGciOiJIUzI1NiIs...",
+    "user": { "id": "...", "name": "Alice Johnson", "email": "alice@example.com" }
+  }
 }
 ```
 
@@ -59,7 +62,7 @@ Save the token for job endpoints:
 TOKEN=$(curl -s -X POST http://localhost:3000/api/v1/auth/login \
   -H 'Content-Type: application/json' \
   -d '{"email":"alice@example.com","password":"password123"}' \
-  | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).token))")
+  | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).data.token))")
 ```
 
 Seeded users (password `password123` for all):
@@ -99,7 +102,7 @@ curl -X POST http://localhost:3000/api/v1/jobs \
     "hiringPerson": "Sarah Chen",
     "notes": "Referred by a friend",
     "appliedDate": "2026-07-01T12:00:00.000Z"
-  }'
+  }' | jq
 ```
 
 Fields:
@@ -116,7 +119,10 @@ Fields:
 | `notes` | no | string or null |
 | `appliedDate` | no | ISO 8601 datetime (defaults to now if omitted) |
 
-Response: `201 Created` with the created job object.
+Response: `201 Created`
+```json
+{ "success": true, "data": { ...job } }
+```
 
 ---
 
@@ -124,10 +130,13 @@ Response: `201 Created` with the created job object.
 
 ```bash
 curl http://localhost:3000/api/v1/jobs \
-  -H "Authorization: Bearer $TOKEN"
+  -H "Authorization: Bearer $TOKEN" | jq
 ```
 
-Response: `200 OK` with an array of jobs (newest first).
+Response: `200 OK`
+```json
+{ "success": true, "data": [ ...jobs ] }
+```
 
 ---
 
@@ -135,7 +144,7 @@ Response: `200 OK` with an array of jobs (newest first).
 
 ```bash
 curl http://localhost:3000/api/v1/jobs/<JOB_ID> \
-  -H "Authorization: Bearer $TOKEN"
+  -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 Example:
@@ -143,13 +152,17 @@ Example:
 ```bash
 JOB_ID=$(curl -s http://localhost:3000/api/v1/jobs \
   -H "Authorization: Bearer $TOKEN" \
-  | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d)[0].id))")
+  | node -e "process.stdin.on('data',d=>console.log(JSON.parse(d).data[0].id))")
 
 curl http://localhost:3000/api/v1/jobs/$JOB_ID \
-  -H "Authorization: Bearer $TOKEN"
+  -H "Authorization: Bearer $TOKEN" | jq
 ```
 
-Response: `200 OK` with the job object, or `404` if not found or not owned by you.
+Response: `200 OK`
+```json
+{ "success": true, "data": { ...job } }
+```
+Returns `{ "success": false, "error": "Job entry not found or unauthorized" }` with `404` if not found.
 
 ---
 
@@ -168,10 +181,13 @@ curl -X PUT http://localhost:3000/api/v1/jobs/<JOB_ID> \
     "status": "interviewed",
     "hiringPerson": "Sarah Chen",
     "notes": "Had a great first round"
-  }'
+  }' | jq
 ```
 
-Same schema as create. Response: `200 OK` with the updated job.
+Same schema as create. Response: `200 OK`
+```json
+{ "success": true, "data": { ...updatedJob } }
+```
 
 ---
 
@@ -179,12 +195,12 @@ Same schema as create. Response: `200 OK` with the updated job.
 
 ```bash
 curl -X DELETE http://localhost:3000/api/v1/jobs/<JOB_ID> \
-  -H "Authorization: Bearer $TOKEN"
+  -H "Authorization: Bearer $TOKEN" | jq
 ```
 
 Response: `200 OK`
 ```json
-{ "message": "Job history entry removed successfully" }
+{ "success": true, "data": { "message": "Job history entry removed successfully" } }
 ```
 
 ---
@@ -192,7 +208,7 @@ Response: `200 OK`
 ## Health Check
 
 ```bash
-curl http://localhost:3000/health
+curl http://localhost:3000/health | jq
 ```
 
 Response: `200 OK`
@@ -215,8 +231,8 @@ Returns `503` if the database is unreachable.
 
 | Status | Meaning |
 |---|---|
-| `400` | Validation error — missing or invalid fields (`{ "errors": ... }`) |
-| `401` | Missing or invalid token (`{ "error": "Access denied. Token missing" }`) |
-| `403` | Token expired or invalid (`{ "error": "Invalid or expired token" }`) |
+| `400` | Validation error — missing or invalid fields (`{ "success": false, "error": { ... } }`) |
+| `401` | Missing or invalid token (`{ "success": false, "error": "Access denied. Token missing" }`) |
+| `403` | Token expired or invalid (`{ "success": false, "error": "Invalid or expired token" }`) |
 | `404` | Route not found or job not owned by you |
 | `500` | Internal server error |

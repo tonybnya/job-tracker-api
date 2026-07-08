@@ -9,6 +9,7 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const prisma = require('../config/prisma');
 const { JWT_SECRET } = require('../middleware/authMiddleware');
+const { sendSuccess, sendError } = require('../utils/response');
 
 exports.register = async (req, res) => {
   const { name, email, password } = req.validatedBody;
@@ -17,9 +18,9 @@ exports.register = async (req, res) => {
     const user =  await prisma.user.create({
       data: { name, email, password: hashedPassword }
     });
-    res.status(201).json({ success: true, message: 'User registered successfully', userId: user.id });
+    sendSuccess(res, 201, { userId: user.id });
   } catch (error) {
-    res.status(400).json({ success: false, error: 'Email already exists.' });
+    sendError(res, 400, 'Email already exists.');
   }
 };
 
@@ -28,9 +29,9 @@ exports.login = async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ success: false, error: 'Invalid email or password.' });
+    return sendError(res, 401, 'Invalid email or password.');
   }
 
   const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '24h' });
-  res.json({ token, user: { id: user.id, name: user.name, email: user.email } });
+  sendSuccess(res, 200, { token, user: { id: user.id, name: user.name, email: user.email } });
 };

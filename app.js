@@ -11,6 +11,7 @@ require('dotenv').config();
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const { sendError } = require('./utils/response');
 
 const prisma = require('./config/prisma');
 
@@ -64,14 +65,13 @@ app.use('/api/v1/jobs', jobRoutes);
 
 // 404 catch-all missing routes
 app.use((req, res) => {
-  res.status(404).json({ success: false, error: 'Route endpoint not found' });
+  sendError(res, 404, 'Route endpoint not found');
 });
 
 // error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
-  res.status(500).json({ success: false, error: 'Internal Server Error' });
-  next();
+  sendError(res, 500, 'Internal Server Error');
 });
 
 const PORT = process.env.PORT || 3000;

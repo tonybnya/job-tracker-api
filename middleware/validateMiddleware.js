@@ -5,11 +5,13 @@
  * Author      : @tonybnya
  */
 
+const { sendError } = require('../utils/response');
+
 const validateBody = (schema) => (req, res, next) => {
   const result = schema.safeParse(req.body);
 
   if (!result.success) {
-    return res.status(400).json({ errors: result.error.format() });
+    return sendError(res, 400, result.error.format());
   }
   req.validatedBody = result.data;
   next();
