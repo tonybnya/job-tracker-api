@@ -5,6 +5,9 @@
  * Author      : @tonybnya
  */
 
+// ensure the env vars load on start
+require('dotenv').config();
+
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
