@@ -24,7 +24,7 @@ const jobSchema = z.object({
   position: z.string().min(1),
   location: z.string().min(1),
   jobType: z.enum(['on-site', 'remote', 'hybrid', 'internship', 'contract', 'part-time']),
-  appliedData: z.string().datetime().optional().transform(val => val ? new Date(val) : new Date()),
+  appliedDate: z.string().datetime().optional().transform(val => val ? new Date(val) : new Date()),
   status: z.enum(['applied', 'phone-screen', 'interviewed', 'offer', 'rejected', 'ghosted']),
   hiringPerson: z.string().optional().nullable(),
   notes: z.string().optional().nullable()
