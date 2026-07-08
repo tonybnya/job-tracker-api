@@ -11,6 +11,7 @@ require('dotenv').config();
 const express = require('express');
 const authRoutes = require('./routes/authRoutes');
 const jobRoutes = require('./routes/jobRoutes');
+const { swaggerSpec, swaggerUi } = require('./config/swagger');
 const { sendError } = require('./utils/response');
 
 const prisma = require('./config/prisma');
@@ -58,6 +59,9 @@ app.get('/health', async (req, res) => {
     res.status(503).json(healthStatus);
   }
 });
+
+// Swagger API documentation
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 // API routes
 app.use('/api/v1/auth', authRoutes);
