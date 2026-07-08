@@ -18,16 +18,16 @@ const loginSchema = z.object({
   password: z.string().min(1)
 });
 
-const JobSchema = z.object({
+const jobSchema = z.object({
   company: z.string().min(1),
   url: z.string().url(),
   position: z.string().min(1),
   location: z.string().min(1),
-  jobType: z.enum(['on-site', 'remote', 'hybrid', 'internship', 'contract, 'part-time']),
+  jobType: z.enum(['on-site', 'remote', 'hybrid', 'internship', 'contract', 'part-time']),
   appliedData: z.string().datetime().optional().transform(val => val ? new Date(val) : new Date()),
   status: z.enum(['applied', 'phone-screen', 'interviewed', 'offer', 'rejected', 'ghosted']),
   hiringPerson: z.string().optional().nullable(),
-  notes. z.string().optional().nullable()
+  notes: z.string().optional().nullable()
 });
 
 module.exports = { registerSchema, loginSchema, jobSchema };

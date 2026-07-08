@@ -14,12 +14,12 @@ exports.createJob = async (req, res) => {
     });
     res.status(201).json(job);
   } catch (error) {
-    res.status.(500).json({ error: error.message });
+    res.status(500).json({ error: error.message });
   }
 };
 
 exports.getJobs = async (req, res) => {
-  const jobs = await = prisma.job.findMany({
+  const jobs = await prisma.job.findMany({
     where: { userId: req.user.id },
     orderBy: { appliedDate: 'desc' }
   });
