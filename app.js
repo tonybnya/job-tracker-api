@@ -64,7 +64,14 @@ app.use('/api/v1/jobs', jobRoutes);
 
 // 404 catch-all missing routes
 app.use((req, res) => {
-  res.status(404).json({ 'error': 'Route endpoint not found' });
+  res.status(404).json({ success: false, error: 'Route endpoint not found' });
+});
+
+// error handling
+app.use((err, req, res, next) => {
+  console.error(err.stack);
+  res.status(500).json({ success: false, error: 'Internal Server Error' });
+  next();
 });
 
 const PORT = process.env.PORT || 3000;
