@@ -17,9 +17,9 @@ exports.register = async (req, res) => {
     const user =  await prisma.user.create({
       data: { name, email, password: hashedPassword }
     });
-    res.status(201).json({ message: 'User registered successfully', userId: user.id });
+    res.status(201).json({ success: true, message: 'User registered successfully', userId: user.id });
   } catch (error) {
-    res.status(400).json({ error: 'Email already exists.' });
+    res.status(400).json({ success: false, error: 'Email already exists.' });
   }
 };
 
@@ -28,7 +28,7 @@ exports.login = async (req, res) => {
   const user = await prisma.user.findUnique({ where: { email } });
 
   if (!user || !(await bcrypt.compare(password, user.password))) {
-    return res.status(401).json({ error: 'Invalid email or password.' });
+    return res.status(401).json({ success: false, error: 'Invalid email or password.' });
   }
 
   const token = jwt.sign({ id: user.id }, JWT_SECRET, { expiresIn: '24h' });

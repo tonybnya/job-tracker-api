@@ -14,7 +14,7 @@ exports.createJob = async (req, res) => {
     });
     res.status(201).json(job);
   } catch (error) {
-    res.status(500).json({ error: error.message });
+    res.status(500).json({ success: false, error: error.message });
   }
 };
 
@@ -30,14 +30,14 @@ exports.getJobById = async (req, res) => {
   const job = await prisma.job.findFirst({
     where: { id: req.params.id, userId: req.user.id }
   });
-  if (!job) return res.status(404).json({ error: 'Job entry not found or unauthorized' });
+  if (!job) return res.status(404).json({ success: false, error: 'Job entry not found or unauthorized' });
   res.json(job);
 };
 
 exports.updateJob = async(req, res) => {
   try {
     const job = await prisma.job.findFirst({ where: { id: req.params.id, userId: req.user.id } });
-    if (!job) return res.status(404).json({ error: 'Job entry not found or unauthorized' });
+    if (!job) return res.status(404).json({ success: false, error: 'Job entry not found or unauthorized' });
 
   const updatedJob = await prisma.job.update({
       where: { id: req.params.id },
@@ -52,10 +52,10 @@ exports.updateJob = async(req, res) => {
 exports.deleteJob = async (req, res) => {
   try {
     const job = await prisma.job.findFirst({ where: { id: req.params.id, userId: req.user.id } });
-    if (!job) return res.status(404).json({ error: 'Job entry not found or unauthorized' });
+    if (!job) return res.status(404).json({ success: false, error: 'Job entry not found or unauthorized' });
 
   await prisma.job.delete({ where: { id: req.params.id} });
-  res.json({ message: 'Job history entry removed successfully' });
+  res.json({ success: true, message: 'Job history entry removed successfully' });
   } catch (error) {
     res.status(500).json({ error: error.message });
   }
