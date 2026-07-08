@@ -1,7 +1,7 @@
 /**
- * Script Name : prisma.config.ts
+ * Script Name : prisma.config.js
  * Description : Prisma config file
- * Usage       : node prisma.config.ts
+ * Usage       : node prisma.config.js
  * Author      : @tonybnya
  */
 

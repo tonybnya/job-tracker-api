@@ -29,3 +29,5 @@ const JobSchema = z.object({
   hiringPerson: z.string().optional().nullable(),
   notes. z.string().optional().nullable()
 });
+
+module.exports = { registerSchema, loginSchema, jobSchema };
