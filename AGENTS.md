@@ -11,6 +11,7 @@ Express 5 + Prisma 7 (SQLite via better-sqlite3 adapter) + Zod 4 + JWT + bcryptj
 - Prisma 7 requires a driver adapter. SQLite uses `@prisma/adapter-better-sqlite3` — see `config/prisma.js`.
 - Prisma config in `prisma.config.js` (ESM — `defineConfig` + imports `DATABASE_URL` from `.env`).
 - After schema changes: `npx prisma generate && npx prisma migrate dev --name <name>`.
+- Seed: `npx prisma db seed` (10 users, 50 jobs). Password for all users: `password123`.
 - `dev.db` is gitignored.
 
 ## Architecture
@@ -29,7 +30,7 @@ app.js → routes/ → controllers/ → prisma → SQLite
 - Routes and controllers split per resource (`auth`, `jobs`)
 
 ## Known state
-- Routes are empty stubs. Auth + job controllers exist but are not wired to routes.
+- Routes are fully wired. Auth (`POST /register`, `POST /login`) and jobs (CRUD at `/api/v1/jobs`) work.
 - Validators and controllers have syntax bugs (see `validators/appSchemas.js`, `controllers/jobController.js`).
 - No tests, no linter, no CI.
 

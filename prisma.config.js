@@ -13,9 +13,9 @@ export default defineConfig({
   schema: 'prisma/schema.prisma',
   migrations: {
     path: 'prisma/migrations',
+    seed: 'node prisma/seed.js',
   },
   datasource: {
-    // map my connection string securely from the .env file
     url: env('DATABASE_URL'),
   }
 });
