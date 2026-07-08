@@ -182,6 +182,31 @@ Response (with `page` & `limit`): `200 OK`
 
 ---
 
+### Get Application Stats
+
+```bash
+curl "http://localhost:3000/api/v1/jobs/stats" \
+  -H "Authorization: Bearer $TOKEN" | jq
+```
+
+Response: `200 OK`
+```json
+{
+  "success": true,
+  "data": [
+    { "status": "applied", "count": 1 },
+    { "status": "phone-screen", "count": 1 },
+    { "status": "interviewed", "count": 1 },
+    { "status": "offer", "count": 1 },
+    { "status": "rejected", "count": 0 },
+    { "status": "ghosted", "count": 0 }
+  ]
+}
+```
+Only statuses with at least one job are returned.
+
+---
+
 ### Get Job by ID
 
 ```bash

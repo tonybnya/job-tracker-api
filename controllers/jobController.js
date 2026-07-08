@@ -62,6 +62,25 @@ exports.getJobs = async (req, res) => {
   }
 };
 
+exports.getStats = async (req, res) => {
+  try {
+    const stats = await prisma.job.groupBy({
+      by: ['status'],
+      where: { userId: req.user.id },
+      _count: { status: true },
+    });
+
+    const result = stats.map((s) => ({
+      status: s.status,
+      count: s._count.status,
+    }));
+
+    sendSuccess(res, 200, result);
+  } catch (error) {
+    sendError(res, 500, error.message);
+  }
+};
+
 exports.getJobById = async (req, res) => {
   const job = await prisma.job.findFirst({
     where: { id: req.params.id, userId: req.user.id }

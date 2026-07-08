@@ -16,6 +16,7 @@ const { authenticateToken } = require('../middleware/authMiddleware');
 router.use(authenticateToken);
 
 router.post('/', validateBody(jobSchema), jobController.createJob);
+router.get('/stats', jobController.getStats);
 router.get('/', jobController.getJobs);
 router.get('/:id', jobController.getJobById);
 router.put('/:id', validateBody(jobSchema), jobController.updateJob);
