@@ -14,23 +14,24 @@ const app = express();
 // middleware to parse JSON request bodies
 app.use(express.json());
 
-// scoped route endpoints
-app.use('/api/v1/auth', authRoutes);
-app.use('/api/v1/jobs', jobRoutes);
-
+// request logger
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
 });
 
-// catch-all route missing handling
-app.use((req, res) => {
-  res.status(404).json({ 'error': 'Route endpoint not found' });
-});
-
 // root endpoint
 app.get('/', (req, res) => {
   res.send("Welcome to Job Tracker Application API");
+});
+
+// API routes
+app.use('/api/v1/auth', authRoutes);
+app.use('/api/v1/jobs', jobRoutes);
+
+// 404 catch-all missing routes
+app.use((req, res) => {
+  res.status(404).json({ 'error': 'Route endpoint not found' });
 });
 
 const PORT = process.env.PORT || 3000;
