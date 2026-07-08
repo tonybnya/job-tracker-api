@@ -1,6 +1,6 @@
 /**
  * Script Name : app.js
- * Description : Describe what this JavaScript/TypeScript file does
+ * Description : Main entry point
  * Usage       : node app.js
  * Author      : @tonybnya
  */
@@ -8,7 +8,9 @@
 const express = require('express');
 const app = express();
 
+// middleware to parse JSON request bodies
 app.use(express.json());
+
 app.use((req, res, next) => {
   console.log(`${req.method} ${req.url}`);
   next();
