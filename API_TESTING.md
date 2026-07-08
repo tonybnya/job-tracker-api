@@ -129,13 +129,55 @@ Response: `201 Created`
 ### List All Jobs
 
 ```bash
+# All jobs (newest first)
 curl http://localhost:3000/api/v1/jobs \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+# Filtered by status
+curl "http://localhost:3000/api/v1/jobs?status=interviewed" \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+# Sorted ascending by date
+curl "http://localhost:3000/api/v1/jobs?sort=date" \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+# Paginated (page 1, 5 per page)
+curl "http://localhost:3000/api/v1/jobs?page=1&limit=5" \
+  -H "Authorization: Bearer $TOKEN" | jq
+
+# Combined
+curl "http://localhost:3000/api/v1/jobs?status=rejected&sort=date&page=1&limit=3" \
   -H "Authorization: Bearer $TOKEN" | jq
 ```
 
-Response: `200 OK`
+Query parameters:
+
+| Param | Type | Description |
+|---|---|---|
+| `status` | string | Filter by job status (`applied`, `phone-screen`, `interviewed`, `offer`, `rejected`, `ghosted`) |
+| `sort` | string | Set to `date` for ascending order (defaults to newest first) |
+| `page` | integer | Page number (starts at 1) |
+| `limit` | integer | Items per page (max 100, defaults to 10 when `page` is set) |
+
+Response (without pagination): `200 OK`
 ```json
 { "success": true, "data": [ ...jobs ] }
+```
+
+Response (with `page` & `limit`): `200 OK`
+```json
+{
+  "success": true,
+  "data": {
+    "jobs": [ ... ],
+    "pagination": {
+      "page": 1,
+      "limit": 5,
+      "total": 50,
+      "totalPages": 10
+    }
+  }
+}
 ```
 
 ---

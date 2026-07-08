@@ -20,11 +20,46 @@ exports.createJob = async (req, res) => {
 };
 
 exports.getJobs = async (req, res) => {
-  const jobs = await prisma.job.findMany({
-    where: { userId: req.user.id },
-    orderBy: { appliedDate: 'desc' }
-  });
-  sendSuccess(res, 200, jobs);
+  try {
+    const { status, sort, page, limit } = req.query;
+
+    const where = { userId: req.user.id };
+    if (status) where.status = status;
+
+    const orderBy = sort === 'date'
+      ? { appliedDate: 'asc' }
+      : { appliedDate: 'desc' };
+
+    if (page && limit) {
+      const pageNum = Math.max(1, parseInt(page, 10) || 1);
+      const limitNum = Math.max(1, Math.min(100, parseInt(limit, 10) || 10));
+
+      const [jobs, total] = await Promise.all([
+        prisma.job.findMany({
+          where,
+          orderBy,
+          skip: (pageNum - 1) * limitNum,
+          take: limitNum,
+        }),
+        prisma.job.count({ where }),
+      ]);
+
+      return sendSuccess(res, 200, {
+        jobs,
+        pagination: {
+          page: pageNum,
+          limit: limitNum,
+          total,
+          totalPages: Math.ceil(total / limitNum),
+        },
+      });
+    }
+
+    const jobs = await prisma.job.findMany({ where, orderBy });
+    sendSuccess(res, 200, jobs);
+  } catch (error) {
+    sendError(res, 500, error.message);
+  }
 };
 
 exports.getJobById = async (req, res) => {
